@@ -19,6 +19,20 @@ own window has to have the focus.
 Settings are remembered between runs; **Defaults** resets them. The text and
 generated values are never saved.
 
+## Download
+
+Ready-made executables are attached to each
+[release](https://github.com/user3278/sendkeys/releases): a Linux binary, a
+Windows `.exe` and a macOS app (Intel and Apple silicon). They are not signed
+with a developer certificate, so the first start needs one extra step:
+
+- **Windows**: SmartScreen may say it protected your PC. Choose *More info*, then
+  *Run anyway*.
+- **macOS**: right-click the app and choose *Open* (or allow it under *System
+  Settings > Privacy & Security*). Then grant it *Accessibility* access when
+  asked, which is what lets it type.
+- **Linux**: `chmod +x sendkeys` after unpacking if needed.
+
 ## Build and run
 
     cargo build --release
@@ -26,6 +40,10 @@ generated values are never saved.
 
 Build on the operating system you want to run it on. No extra system packages are
 needed on Linux.
+
+To publish a release, push a tag such as `v0.2.0` (after updating the version in
+`Cargo.toml`); the *Release* workflow builds all three executables and attaches
+them.
 
 ## How it types on each platform
 

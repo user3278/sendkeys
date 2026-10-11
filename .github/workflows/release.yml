@@ -1,0 +1,98 @@
+name: Release
+
+# Push a tag like v0.1.0, or run this manually with a tag name, to build the
+# executables and publish them as a GitHub release. A manual run without a tag
+# only builds (the executables are kept as workflow artifacts).
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Tag to release, e.g. v0.1.0 (leave empty to only build)"
+        required: false
+
+permissions:
+  contents: write
+
+env:
+  TAG: ${{ inputs.tag || (github.ref_type == 'tag' && github.ref_name) || '' }}
+  LABEL: ${{ inputs.tag || (github.ref_type == 'tag' && github.ref_name) || github.sha }}
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        # ubuntu-22.04 keeps the Linux binary usable on older distributions.
+        os: [ubuntu-22.04, windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Update Rust
+        run: rustup update stable && rustup default stable
+
+      - name: Test
+        if: runner.os == 'Linux'
+        run: cargo test --locked
+
+      - name: Build (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          cargo build --release --locked
+          tar -C target/release -czf "sendkeys-$LABEL-linux-x86_64.tar.gz" sendkeys
+
+      - name: Build (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          cargo build --release --locked
+          7z a "sendkeys-$LABEL-windows-x86_64.zip" ./target/release/sendkeys.exe
+
+      - name: Build (macOS, universal app)
+        if: runner.os == 'macOS'
+        env:
+          MACOSX_DEPLOYMENT_TARGET: "11.0"
+        run: |
+          rustup target add aarch64-apple-darwin x86_64-apple-darwin
+          cargo build --release --locked --target aarch64-apple-darwin
+          cargo build --release --locked --target x86_64-apple-darwin
+          app=SendKeys.app
+          mkdir -p "$app/Contents/MacOS"
+          lipo -create -output "$app/Contents/MacOS/sendkeys" \
+            target/aarch64-apple-darwin/release/sendkeys \
+            target/x86_64-apple-darwin/release/sendkeys
+          version=$(sed -n 's/^version = "\(.*\)"/\1/p' Cargo.toml | head -1)
+          sed "s/@VERSION@/$version/" packaging/macos/Info.plist > "$app/Contents/Info.plist"
+          # Ad-hoc signature: required on Apple silicon, but not a developer identity.
+          codesign --force --sign - "$app"
+          ditto -c -k --keepParent "$app" "sendkeys-$LABEL-macos-universal.zip"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: sendkeys-${{ runner.os }}
+          path: sendkeys-*
+          if-no-files-found: error
+
+  release:
+    needs: build
+    if: ${{ inputs.tag || github.ref_type == 'tag' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+
+      - name: Publish release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$TAG" dist/* \
+            --repo "$GITHUB_REPOSITORY" \
+            --target "$GITHUB_SHA" \
+            --title "SendKeys $TAG" \
+            --generate-notes
