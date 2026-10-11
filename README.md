@@ -3,6 +3,8 @@
 Types text into whichever window has the focus, one key press at a time. Made for
 remote consoles (noVNC and similar) that have no clipboard.
 
+![The SendKeys window: a text box, timing options, generators and Send/Stop buttons](docs/screenshot.png)
+
 Paste or write the text, press **Send**, click into the target window during the
 countdown, and the text is typed there. **Stop** or the **Escape** key interrupts
 it. On X11, Windows and macOS Escape works from any window; on Wayland the app's
