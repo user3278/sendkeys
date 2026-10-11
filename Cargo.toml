@@ -1,0 +1,27 @@
+[package]
+name = "sendkeys"
+version = "0.1.0"
+edition = "2024"
+description = "Types text into the focused window as keystrokes, for remote consoles without a clipboard"
+
+[dependencies]
+eframe = { version = "0.36", default-features = false, features = ["glow", "default_fonts", "x11", "wayland", "persistence"] }
+getrandom = "0.3"
+serde = { version = "1", features = ["derive"] }
+
+# Linux/BSD: talk to X11 directly, or to the desktop's RemoteDesktop portal on Wayland.
+[target.'cfg(all(unix, not(target_os = "macos")))'.dependencies]
+x11rb = { version = "0.13", features = ["xtest", "xkb"] }
+xkeysym = "0.2"
+ashpd = { version = "0.13", default-features = false, features = ["tokio", "remote_desktop", "screencast"] }
+tokio = { version = "1", features = ["rt-multi-thread"] }
+
+[target.'cfg(any(windows, target_os = "macos"))'.dependencies]
+enigo = "0.6"
+
+[profile.release]
+opt-level = "s"
+lto = true
+codegen-units = 1
+strip = true
+panic = "abort"
