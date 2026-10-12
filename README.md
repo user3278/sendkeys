@@ -33,7 +33,13 @@ with a developer certificate, so the first start needs one extra step:
 - **macOS**: right-click the app and choose *Open* (or allow it under *System
   Settings > Privacy & Security*). Then grant it *Accessibility* access when
   asked, which is what lets it type.
-- **Linux**: `chmod +x sendkeys` after unpacking if needed.
+- **Linux**: `chmod +x sendkeys` after unpacking if needed. To get a launcher with
+  the icon in your applications menu, from a checkout of this repository:
+
+      install -Dm755 sendkeys ~/.local/bin/sendkeys
+      install -Dm644 assets/icon.png ~/.local/share/icons/hicolor/256x256/apps/sendkeys.png
+      sed "s|^Exec=sendkeys|Exec=$HOME/.local/bin/sendkeys|" packaging/linux/sendkeys.desktop \
+        > ~/.local/share/applications/sendkeys.desktop
 
 ## Build and run
 

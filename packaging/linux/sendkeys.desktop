@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=SendKeys
+Comment=Type text into the focused window as keystrokes
+Exec=sendkeys
+Icon=sendkeys
+Terminal=false
+Categories=Utility;
+StartupWMClass=sendkeys

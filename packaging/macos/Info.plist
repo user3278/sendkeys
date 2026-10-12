@@ -10,6 +10,8 @@
     <string>io.github.user3278.sendkeys</string>
     <key>CFBundleExecutable</key>
     <string>sendkeys</string>
+    <key>CFBundleIconFile</key>
+    <string>icon</string>
     <key>CFBundlePackageType</key>
     <string>APPL</string>
     <key>CFBundleShortVersionString</key>

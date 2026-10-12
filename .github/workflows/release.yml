@@ -61,7 +61,8 @@ jobs:
           cargo build --release --locked --target aarch64-apple-darwin
           cargo build --release --locked --target x86_64-apple-darwin
           app=SendKeys.app
-          mkdir -p "$app/Contents/MacOS"
+          mkdir -p "$app/Contents/MacOS" "$app/Contents/Resources"
+          cp assets/icon.icns "$app/Contents/Resources/icon.icns"
           lipo -create -output "$app/Contents/MacOS/sendkeys" \
             target/aarch64-apple-darwin/release/sendkeys \
             target/x86_64-apple-darwin/release/sendkeys

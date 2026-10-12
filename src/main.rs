@@ -317,9 +317,12 @@ impl eframe::App for App {
 }
 
 fn main() -> eframe::Result {
+    let icon = eframe::icon_data::from_png_bytes(include_bytes!("../assets/icon.png"))
+        .expect("the bundled icon is a valid PNG");
     let options = eframe::NativeOptions {
         viewport: egui::ViewportBuilder::default()
             .with_app_id("sendkeys")
+            .with_icon(icon)
             .with_inner_size([600.0, 640.0])
             .with_min_inner_size([420.0, 360.0]),
         ..Default::default()

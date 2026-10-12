@@ -1,6 +1,6 @@
 [package]
 name = "sendkeys"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2024"
 description = "Types text into the focused window as keystrokes, for remote consoles without a clipboard"
 
@@ -18,6 +18,9 @@ tokio = { version = "1", features = ["rt-multi-thread"] }
 
 [target.'cfg(any(windows, target_os = "macos"))'.dependencies]
 enigo = "0.6"
+
+[target.'cfg(windows)'.build-dependencies]
+winresource = "0.1"
 
 [profile.release]
 opt-level = "s"
